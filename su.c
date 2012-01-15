@@ -38,6 +38,7 @@
 
 #include <private/android_filesystem_config.h>
 #include <cutils/log.h>
+#include <cutils/properties.h>
 
 #include <sqlite3.h>
 
@@ -294,7 +295,9 @@ int main(int argc, char *argv[])
 {
     struct stat st;
     static int socket_serv_fd = -1;
-    char buf[64], shell[PATH_MAX], *result;
+    char buf[64], shell[PATH_MAX], *result, debuggable[PROPERTY_VALUE_MAX];
+    char enabled[PROPERTY_VALUE_MAX], build_type[PROPERTY_VALUE_MAX];
+    char cm_version[PROPERTY_VALUE_MAX];
     int i, dballow;
     mode_t orig_umask;
 
@@ -343,6 +346,27 @@ int main(int argc, char *argv[])
 
     if (from_init(&su_from) < 0) {
         deny();
+    }
+
+    property_get("ro.debuggable", debuggable, "0");
+    property_get("persist.sys.root_access", enabled, "0");
+    property_get("ro.build.type", build_type, "");
+    property_get("ro.cm.version", cm_version, "");
+
+    // CyanogenMod-specific behavior
+    if (strlen(cm_version) > 0) {
+        // only allow su on debuggable builds
+        if (strcmp("1", debuggable) != 0) {
+            LOGE("Root access is disabled on non-debug builds");
+            deny();
+        }
+
+        // enforce persist.sys.root_access on non-eng builds
+        if (strcmp("eng", build_type) != 0 &&
+                strcmp("1", enabled) != 0 && strcmp("3", enabled) != 0) {
+            LOGE("Root access is disabled by system setting - enable it under settings -> developer options");
+            deny();
+        }
     }
 
     orig_umask = umask(027);
