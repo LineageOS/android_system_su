@@ -38,6 +38,7 @@
 
 #include <private/android_filesystem_config.h>
 #include <cutils/log.h>
+#include <cutils/properties.h>
 
 #include <sqlite3.h>
 
@@ -294,7 +295,7 @@ int main(int argc, char *argv[])
 {
     struct stat st;
     static int socket_serv_fd = -1;
-    char buf[64], shell[PATH_MAX], *result;
+    char buf[64], shell[PATH_MAX], *result, debuggable[PROPERTY_VALUE_MAX], enabled[PROPERTY_VALUE_MAX];
     int i, dballow;
     mode_t orig_umask;
 
@@ -343,6 +344,18 @@ int main(int argc, char *argv[])
 
     if (from_init(&su_from) < 0) {
         deny();
+    }
+
+    property_get("ro.debuggable", debuggable, "0");
+    property_get("persist.sys.root_access", enabled, "0");
+
+    // enforce persist.sys.root_access on non-eng builds
+    if (strcmp("1", debuggable) != 0 || strcmp("1", enabled) != 0) {
+        property_get("ro.build.type", enabled, "");
+        if (strcmp("eng", enabled) != 0) {
+            LOGE("Root access is disabled by system setting - enable it under settings -> developer options");
+            deny();
+        }
     }
 
     orig_umask = umask(027);
