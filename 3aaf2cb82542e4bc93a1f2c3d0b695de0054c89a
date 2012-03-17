@@ -172,6 +172,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARX///k0\u003d",
+        "filename": "utils.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 293
+      },
+      "writtenOn": "2012-03-17T22:31:41Z",
+      "side": 1,
+      "message": "In a normal system, these property files on /system and / are not modified. (/system is ro, etc), an the property service reads them only once at boot.\n\nI can\u0027t think of a non-malicious valid reason to change them at runtime (apart from maybe modifying them for the next boot), and if something malicious *can* modify them at runtime, it\u0027s already game over and such an agent is not likely to care about locking...",
+      "parentUuid": "AAAARX///lk\u003d",
+      "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARX///lg\u003d",
         "filename": "utils.c",
         "patchSetId": 1
