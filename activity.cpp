@@ -25,6 +25,7 @@
 
 extern "C" {
 #include "su.h"
+#include "utils.h"
 #include <private/android_filesystem_config.h>
 #include <cutils/properties.h>
 }
@@ -42,10 +43,14 @@ static const int START_SUCCESS = 0;
 
 int send_intent(struct su_initiator *from, struct su_request *to, const char *socket_path, int allow, int type)
 {
+    char *props;
+    unsigned sz;
     char sdk_version_prop[PROPERTY_VALUE_MAX] = "0";
-    property_get("ro.build.version.sdk", sdk_version_prop, "0");
+    props = read_file("/system/build.prop", &sz);
+    get_property(props, sdk_version_prop, "ro.build.version.sdk", "0");
+    free(props);
 
-    int sdk_version = atoi(sdk_version_prop); 
+    int sdk_version = atoi(sdk_version_prop);
 
     sp<IServiceManager> sm = defaultServiceManager();
     sp<IBinder> am = sm->checkService(String16("activity"));
