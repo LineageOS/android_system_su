@@ -42,6 +42,7 @@
 
 #include <sqlite3.h>
 
+#include "utils.h"
 #include "su.h"
 
 //extern char* _mktemp(char*); /* mktemp doesn't link right.  Don't ask me why. */
@@ -300,6 +301,8 @@ int main(int argc, char *argv[])
     char cm_version[PROPERTY_VALUE_MAX];
     int i, dballow;
     mode_t orig_umask;
+    char *data;
+    unsigned sz;
 
     for (i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--command")) {
@@ -348,10 +351,25 @@ int main(int argc, char *argv[])
         deny();
     }
 
-    property_get("ro.debuggable", debuggable, "0");
-    property_get("persist.sys.root_access", enabled, "1");
-    property_get("ro.build.type", build_type, "");
-    property_get("ro.cm.version", cm_version, "");
+    // we can't simply use the property service, since we aren't launched from init and
+    // can't trust the location of the property workspace. find the properties ourselves.
+    data = read_file("/default.prop", &sz);
+    if (data != 0)
+        get_property(data, debuggable, "ro.debuggable", "0");
+
+    data = read_file("/system/build.prop", &sz);
+    if (data != 0) {
+        get_property(data, cm_version, "ro.cm.version", "");
+        get_property(data, build_type, "ro.build.type", "");
+    }
+
+    data = read_file("/data/property/persist.sys.root_access", &sz);
+    if (data != 0)
+        memcpy(enabled, data, strlen(data));
+    else
+        memcpy(enabled, "1", 1);
+
+    free(data);
 
     orig_umask = umask(027);
 
