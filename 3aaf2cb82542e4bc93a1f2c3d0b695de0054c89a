@@ -190,6 +190,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARX///js\u003d",
+        "filename": "utils.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-17T23:31:03Z",
+      "side": 1,
+      "message": "This method is also used to read /data/property/persist.sys.root_access. This file is (presumably) modified by the system when the user changes the root_access setting. Although it doesn\u0027t contain arbitrary user supplied data, it *could* be problematic that the file is written by one process and read by a different process without locking. I doubt it has any security significance. \n\nSee http://review.cyanogenmod.com/#patch,sidebyside,13696,1,su.c line 366.",
+      "parentUuid": "AAAARX///k0\u003d",
+      "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARX///lg\u003d",
         "filename": "utils.c",
         "patchSetId": 1
