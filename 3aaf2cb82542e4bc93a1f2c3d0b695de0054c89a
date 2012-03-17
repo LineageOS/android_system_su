@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAARX///l0\u003d",
+        "filename": "activity.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-17T21:42:12Z",
+      "side": 1,
+      "message": "remove unnecessary include",
+      "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARX///lw\u003d",
+        "filename": "activity.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-17T21:42:12Z",
+      "side": 1,
+      "message": "check props return value before calling get_property",
+      "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARX///ls\u003d",
+        "filename": "su.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-17T21:42:12Z",
+      "side": 1,
+      "message": "use \"NULL\", not \"0\" (here and lots of places).",
+      "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARX///mw\u003d",
         "filename": "su.c",
         "patchSetId": 1
@@ -13,6 +64,23 @@
       "writtenOn": "2012-03-17T20:59:19Z",
       "side": 1,
       "message": "free(data);",
+      "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARX///lc\u003d",
+        "filename": "su.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-17T21:42:12Z",
+      "side": 1,
+      "message": "Since you\u0027re writing your own get_property() routine here, I would suggest that you pass in the length of the second argument, so that get_property() can verify it\u0027s not writing more data than it should. Relying on the caller to do the bounds checking is error prone and better done by the called method.\n\nget_property(data, cm_version, sizeof(cm_version), \"ro.cm.version\", \"\");",
       "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
@@ -64,6 +132,40 @@
       "writtenOn": "2012-03-17T20:59:19Z",
       "side": 1,
       "message": "memcpy(enabled, \"1\", 2);  /* don\u0027t forget terminating zero */",
+      "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARX///lk\u003d",
+        "filename": "utils.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-17T21:42:12Z",
+      "side": 1,
+      "message": "Don\u0027t you need some kind of locking here, to prevent simultaneous reads / writes to the contents of these files?",
+      "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARX///lg\u003d",
+        "filename": "utils.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-17T21:42:12Z",
+      "side": 1,
+      "message": "fstat() will give you the length info without all the seeking.",
       "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
