@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARX///VI\u003d",
+        "filename": "utils.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-18T20:58:24Z",
+      "side": 1,
+      "message": "use spaces not tab.",
+      "revId": "8676342eaf1c97403d8bccfe05c31ff89cde223e",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARX///VE\u003d",
+        "filename": "utils.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-18T20:58:24Z",
+      "side": 1,
+      "message": "use spaces not tab.",
+      "revId": "8676342eaf1c97403d8bccfe05c31ff89cde223e",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
