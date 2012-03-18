@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARX///go\u003d",
+        "filename": "activity.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 32
+      },
+      "writtenOn": "2012-03-18T01:36:55Z",
+      "side": 1,
+      "message": "Needed for PROPERTY_VALUE_MAX",
+      "parentUuid": "AAAARX///l0\u003d",
+      "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARX///lw\u003d",
         "filename": "activity.cpp",
         "patchSetId": 1
@@ -47,6 +65,24 @@
       "writtenOn": "2012-03-17T21:47:49Z",
       "side": 1,
       "message": "remove unnecessary include.",
+      "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARX///gM\u003d",
+        "filename": "su.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 32
+      },
+      "writtenOn": "2012-03-18T01:36:55Z",
+      "side": 1,
+      "message": "Needed for PROPERTY_VALUE_MAX",
+      "parentUuid": "AAAARX///lU\u003d",
       "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
@@ -220,6 +256,24 @@
       "side": 1,
       "message": "Not an issue there.  Those are updated by writing to a temporary version then atomicly rename()\u0027ing them over top of the old file to avoid issues like that.",
       "parentUuid": "AAAARX///js\u003d",
+      "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARX///gc\u003d",
+        "filename": "utils.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 32
+      },
+      "writtenOn": "2012-03-18T01:36:55Z",
+      "side": 1,
+      "message": "I shamelessly stole these two functions from init, with some minor changes.",
+      "parentUuid": "AAAARX///jg\u003d",
       "revId": "3aaf2cb82542e4bc93a1f2c3d0b695de0054c89a",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
