@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAARX///eI\u003d",
+        "filename": "activity.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-18T07:36:05Z",
+      "side": 1,
+      "message": "oops, on this issue, I missed the initializer on line 48.  Ignore this comment.",
+      "parentUuid": "AAAARX///ek\u003d",
+      "revId": "0490cd7b3fe8dc7306e28d04f5cfe35dd0154398",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAARX///ec\u003d",
         "filename": "su.c",
         "patchSetId": 3
