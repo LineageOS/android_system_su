@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARX///ek\u003d",
+        "filename": "activity.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-18T07:31:18Z",
+      "side": 1,
+      "message": "if props \u003d\u003d NULL, then line 51 will never get executed, sdk_version_prop will remain uninitialized, and atoi() will be called on uninitialized memory.",
+      "revId": "0490cd7b3fe8dc7306e28d04f5cfe35dd0154398",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARX///ec\u003d",
+        "filename": "su.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-18T07:31:18Z",
+      "side": 1,
+      "message": "cm_version is uninitialized if read_file() line 362 returns null.",
+      "revId": "0490cd7b3fe8dc7306e28d04f5cfe35dd0154398",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARX///eg\u003d",
+        "filename": "su.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-18T07:31:18Z",
+      "side": 1,
+      "message": "debuggable can be uninitialized if read_file() returns NULL on 356.",
+      "revId": "0490cd7b3fe8dc7306e28d04f5cfe35dd0154398",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARX///eY\u003d",
+        "filename": "su.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-18T07:31:18Z",
+      "side": 1,
+      "message": "same use of uninitialized memory.",
+      "revId": "0490cd7b3fe8dc7306e28d04f5cfe35dd0154398",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAARX///eQ\u003d",
+        "filename": "utils.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-18T07:31:18Z",
+      "side": 1,
+      "message": "these two lines can be simplified as \n\nstrcpy(found, not_found)",
+      "revId": "0490cd7b3fe8dc7306e28d04f5cfe35dd0154398",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
