@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARX///Qw\u003d",
+        "filename": "utils.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-19T03:36:37Z",
+      "side": 1,
+      "message": "Looks like an off-by-one error here.\n\nThis should probably be \n\n  if (len \u003e\u003d PROPERTY_VALUE_MAX)\n\nIf len \u003d\u003d PROPERTY_VALUE_MAX, then the memcpy on line 95 will end up writing PROPERTY_VALUE_MAX + 1 bytes to \"found\", overwriting the destination buffer by 1 byte.",
+      "revId": "54c07c7e6d2702051171339cc30e7668e3ff90f9",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
