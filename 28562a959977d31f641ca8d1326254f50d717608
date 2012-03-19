@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARX///QU\u003d",
+        "filename": "su.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 2975
+      },
+      "writtenOn": "2012-03-19T04:52:42Z",
+      "side": 1,
+      "message": "Thanks for mentioning the other check.\n\nShouldn\u0027t this be memcpy(enabled, data, len + 1), so you get the string null termination?\n\nOr perhaps use strcpy(enabled, data), which has the same net effect.",
+      "revId": "28562a959977d31f641ca8d1326254f50d717608",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
