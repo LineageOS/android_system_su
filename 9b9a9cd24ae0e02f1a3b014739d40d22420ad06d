@@ -1,0 +1,10 @@
+Change-Id: I9b9a9cd24ae0e02f1a3b014739d40d22420ad06d
+Code-Review+1: Steve Kondik <shade@chemlab.org>
+Code-Review+2: Koushik Dutta <koushd@gmail.com>
+Verified+1: Koushik Dutta <koushd@gmail.com>
+Code-Review+1: nebkat <nebkat@teamhacksung.org>
+Submitted-by: Koushik Dutta <koushd@gmail.com>
+Submitted-at: Mon, 07 May 2012 02:14:25 +0400
+Reviewed-on: http://review.cyanogenmod.com/15606
+Project: CyanogenMod/android_system_su
+Branch: refs/heads/ics
