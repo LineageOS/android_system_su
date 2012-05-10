@@ -61,6 +61,8 @@ int send_intent(struct su_initiator *from, struct su_request *to, const char *so
         "TZDIR",
         "LD_AOUT_LIBRARY_PATH",
         "LD_AOUT_PRELOAD",
+        // not listed in linker, used due to system() call
+        "IFS",
     };
     const char* const* cp   = unsec_vars;
     const char* const* endp = cp + sizeof(unsec_vars)/sizeof(unsec_vars[0]);
