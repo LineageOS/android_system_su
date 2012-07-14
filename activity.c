@@ -29,7 +29,7 @@ int send_intent(struct su_initiator *from, struct su_request *to, const char *so
     } else {
         strcpy(action, "com.noshufou.android.su.RESULT");
     }
-    sprintf(command, "/system/bin/am broadcast -a '%s' --es socket '%s' --ei caller_uid '%d' --es caller_bin '%s' --ei desired_uid '%d' --es desired_cmd '%s' --ei allow '%d' --ei version_code '%d' > /dev/null", action, socket_path, from->uid, from->bin, to->uid, to->command, allow, VERSION_CODE);
+    sprintf(command, "(/system/bin/am broadcast -a '%s' --es socket '%s' --ei caller_uid '%d' --es caller_bin '%s' --ei desired_uid '%d' --es desired_cmd '%s' --ei allow '%d' --ei version_code '%d' %s) > /dev/null", action, socket_path, from->uid, from->bin, to->uid, to->command, allow, VERSION_CODE, type == 0 ? "" : "&");
     // before sending the intent, make sure the (uid and euid) and (gid and egid) match,
     // otherwise LD_LIBRARY_PATH is wiped in Android 4.0+.
     // Also, sanitize all secure environment variables (from linker_environ.c in linker).
