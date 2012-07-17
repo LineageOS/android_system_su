@@ -89,15 +89,15 @@ static inline char *get_command(const struct su_request *to)
 }
 
 #if 0
-#undef LOGE
-#define LOGE(fmt,args...) fprintf(stderr, fmt, ##args)
-#undef LOGD
-#define LOGD(fmt,args...) fprintf(stderr, fmt, ##args)
-#undef LOGW
-#define LOGW(fmt,args...) fprintf(stderr, fmt, ##args)
+#undef ALOGE
+#define ALOGE(fmt,args...) fprintf(stderr, fmt, ##args)
+#undef ALOGD
+#define ALOGD(fmt,args...) fprintf(stderr, fmt, ##args)
+#undef ALOGW
+#define ALOGW(fmt,args...) fprintf(stderr, fmt, ##args)
 #endif
 
-#define PLOGE(fmt,args...) LOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno))
-#define PLOGEV(fmt,err,args...) LOGE(fmt " failed with %d: %s", ##args, err, strerror(err))
+#define PLOGE(fmt,args...) ALOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno))
+#define PLOGEV(fmt,err,args...) ALOGE(fmt " failed with %d: %s", ##args, err, strerror(err))
 
 #endif
