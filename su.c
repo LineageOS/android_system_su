@@ -335,7 +335,7 @@ static void allow(const struct su_context *ctx)
     (ctx->to.optind + (arg) < ctx->to.argc) ? " " : "",					\
     (ctx->to.optind + (arg) < ctx->to.argc) ? ctx->to.argv[ctx->to.optind + (arg)] : ""
 
-    ALOGD("%u %s executing %u %s using shell %s : %s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+    ALOGV("uid %u %s executing %u %s using shell %s : %s%s%s%s%s%s%s%s%s%s%s%s%s%s",
             ctx->from.uid, ctx->from.bin,
             ctx->to.uid, get_command(&ctx->to), ctx->to.shell,
             arg0, PARG(0), PARG(1), PARG(2), PARG(3), PARG(4), PARG(5),

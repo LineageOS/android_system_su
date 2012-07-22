@@ -15,18 +15,23 @@
 ** limitations under the License.
 */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
 #include <unistd.h>
 
+#include "utils.h"
 #include "su.h"
 
 int send_intent(const struct su_context *ctx,
                 const char *socket_path, int allow, const char *action)
 {
-	char command[PATH_MAX];
+    char command[PATH_MAX];
 
-	sprintf(command, "(/system/bin/am broadcast -a '%s' --es socket '%s' --ei caller_uid '%d' --ei allow '%d' --ei version_code '%d' %s) > /dev/null",
-			action, socket_path, ctx->from.uid, allow, VERSION_CODE,
-			strcmp(action, ACTION_RESULT) ? "" : "&");
+    sprintf(command, "(/system/bin/am broadcast -a '%s' --es socket '%s' --ei caller_uid '%d' --ei allow '%d' --ei version_code '%d' %s) > /dev/null",
+            action, socket_path, ctx->from.uid, allow, VERSION_CODE,
+            strcmp(action, ACTION_RESULT) ? "" : "&");
 
     // before sending the intent, make sure the (uid and euid) and (gid and egid) match,
     // otherwise LD_LIBRARY_PATH is wiped in Android 4.0+.
@@ -73,5 +78,5 @@ int send_intent(const struct su_context *ctx,
     setenv("LD_LIBRARY_PATH", "/vendor/lib:/system/lib", 1);
     setegid(getgid());
     seteuid(getuid());
-    return system(command);
+    return system_nosh(command);
 }
