@@ -481,12 +481,13 @@ int main(int argc, char *argv[])
 
     // CyanogenMod-specific behavior
     if (strlen(cm_version) > 0) {
+#if 0
         // only allow su on debuggable builds
         if (strcmp("1", debuggable) != 0) {
             ALOGE("Root access is disabled on non-debug builds");
             deny(&ctx);
         }
-
+#endif
         // enforce persist.sys.root_access on non-eng builds
         if (strcmp("eng", build_type) != 0 &&
                (atoi(enabled) & 1) != 1 ) {

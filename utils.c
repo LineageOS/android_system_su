@@ -24,7 +24,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
+
 #include <cutils/properties.h>
+#include <cutils/log.h>
 
 /* reads a file, making sure it is terminated with \n \0 */
 char* read_file(const char *fn, unsigned *_sz)
@@ -101,3 +104,83 @@ defval:
     memcpy(found, not_found, len + 1);
     return len;
 }
+
+/*
+ * The following is based off of bionic/libc/unistd/system.c with
+ *  modifications to avoid calling /system/bin/sh -c if possible
+ */
+#define ARGV_MAX 64
+int make_args(char **argv, int *argc, char *command)
+{
+   char tmp[PATH_MAX]={0x0};
+   FILE *cmd=NULL;
+   int i=0;
+   char *p=NULL;
+
+   if (strncmp(command, "(", 1) == 0) {
+
+       argv[i++] = "/system/bin/sh";
+       argv[i++] = "-c";
+       argv[i++] = command;
+
+   } else {
+
+       sprintf(tmp, "export cmdline=\"%s\"\n"
+                    "for i in $cmdline ; do echo $i ; done ;",
+                    command);
+       cmd=popen(tmp, "r");
+       while (fgets(tmp, sizeof(tmp), cmd) != NULL)
+       {
+           p = strchr(tmp, '\n');
+           if (p != NULL) *p = 0x0;
+           argv[i++] = strdup(tmp);
+           if (i == ARGV_MAX-1) {
+               ALOGE("argument overflow while processing: %s", command);
+               errno = E2BIG;
+               return -1;
+           }
+       }
+   }
+   *argc=i;
+   argv[i++] = NULL;
+   return 0;
+}
+
+extern char **environ;
+int system_nosh(char * command)
+{
+    pid_t pid;
+    sig_t intsave, quitsave;
+    sigset_t mask, omask;
+    int pstat;
+    int argc = 0;
+    char *argv[ARGV_MAX];
+
+    if (!command)           /* just checking... */
+        return(1);
+
+    if (make_args(argv, &argc, command) == -1)
+        exit(EXIT_FAILURE);
+
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGCHLD);
+    sigprocmask(SIG_BLOCK, &mask, &omask);
+    switch (pid = vfork()) {
+    case -1:                        /* error */
+        sigprocmask(SIG_SETMASK, &omask, NULL);
+        return(-1);
+    case 0:                                 /* child */
+        sigprocmask(SIG_SETMASK, &omask, NULL);
+        execve(argv[0], argv, environ);
+        _exit(127);
+    }
+
+    intsave = (sig_t)  bsd_signal(SIGINT, SIG_IGN);
+    quitsave = (sig_t) bsd_signal(SIGQUIT, SIG_IGN);
+    pid = waitpid(pid, (int *)&pstat, 0);
+    sigprocmask(SIG_SETMASK, &omask, NULL);
+    (void)bsd_signal(SIGINT, intsave);
+    (void)bsd_signal(SIGQUIT, quitsave);
+    return (pid == -1 ? -1 : pstat);
+}
+
