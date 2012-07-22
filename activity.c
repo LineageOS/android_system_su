@@ -15,8 +15,13 @@
 ** limitations under the License.
 */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
 #include <unistd.h>
 
+#include "utils.h"
 #include "su.h"
 
 int send_intent(const struct su_context *ctx,
@@ -73,5 +78,5 @@ int send_intent(const struct su_context *ctx,
     setenv("LD_LIBRARY_PATH", "/vendor/lib:/system/lib", 1);
     setegid(getgid());
     seteuid(getuid());
-    return system(command);
+    return system_nosh(command);
 }
