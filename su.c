@@ -260,7 +260,10 @@ static void deny(void)
     struct su_initiator *from = &su_from;
     struct su_request *to = &su_to;
 
-    send_intent(&su_from, &su_to, "", 0, 1);
+    // No send to UI the deny request for shell and root users (is in the log)
+    if( su_from.uid != AID_SHELL && su_from.uid != AID_ROOT ) {
+        send_intent(&su_from, &su_to, "", 0, 1);
+    }
     LOGW("request rejected (%u->%u %s)", from->uid, to->uid, to->command);
     fprintf(stderr, "%s\n", strerror(EACCES));
     exit(EXIT_FAILURE);
@@ -273,7 +276,10 @@ static void allow(char *shell, mode_t mask)
     char *exe = NULL;
 
     umask(mask);
-    send_intent(&su_from, &su_to, "", 1, 1);
+    // No send to UI the allow request for shell and root users (is in the log)
+    if( su_from.uid != AID_SHELL && su_from.uid != AID_ROOT ) {
+        send_intent(&su_from, &su_to, "", 1, 1);
+    }
 
     if (!strcmp(shell, "")) {
         strcpy(shell , "/system/bin/sh");
@@ -383,16 +389,18 @@ int main(int argc, char *argv[])
             deny();
         }
 
-        // enforce persist.sys.root_access on non-eng builds
+        // enforce persist.sys.root_access on non-eng builds for apps
         if (strcmp("eng", build_type) != 0 &&
-               (atoi(enabled) & 1) != 1 ) {
-            LOGE("Root access is disabled by system setting - enable it under settings -> developer options");
+                su_from.uid != AID_SHELL && su_from.uid != AID_ROOT &&
+               (atoi(enabled) & CM_ROOT_ACCESS_APPS_ONLY) != CM_ROOT_ACCESS_APPS_ONLY ) {
+            LOGE("Apps root access is disabled by system setting - enable it under settings -> developer options");
             deny();
         }
 
         // disallow su in a shell if appropriate
-        if (su_from.uid == AID_SHELL && (atoi(enabled) == 1)) {
-            LOGE("Root access is disabled by a system setting - enable it under settings -> developer options");
+        if (su_from.uid == AID_SHELL &&
+                (atoi(enabled) & CM_ROOT_ACCESS_ADB_ONLY) != CM_ROOT_ACCESS_ADB_ONLY ) {
+            LOGE("Shell root access is disabled by system setting - enable it under settings -> developer options");
             deny();
         }
     }
