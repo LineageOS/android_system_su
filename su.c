@@ -283,7 +283,10 @@ static void deny(const struct su_context *ctx)
 {
     char *cmd = get_command(&ctx->to);
 
-    send_intent(ctx, "", 0, ACTION_RESULT);
+    // No send to UI the deny request for shell and root users (is in the log)
+    if( ctx->from.uid != AID_SHELL && ctx->from.uid != AID_ROOT ) {
+        send_intent(ctx, "", 0, ACTION_RESULT);
+    }
     ALOGW("request rejected (%u->%u %s)", ctx->from.uid, ctx->to.uid, cmd);
     fprintf(stderr, "%s\n", strerror(EACCES));
     exit(EXIT_FAILURE);
@@ -295,7 +298,10 @@ static void allow(const struct su_context *ctx)
     int argc, err;
 
     umask(ctx->umask);
-    send_intent(ctx, "", 1, ACTION_RESULT);
+    // No send to UI the allow request for shell and root users (is in the log)
+    if( ctx->from.uid != AID_SHELL && ctx->from.uid != AID_ROOT ) {
+        send_intent(ctx, "", 1, ACTION_RESULT);
+    }
 
     arg0 = strrchr (ctx->to.shell, '/');
     arg0 = (arg0) ? arg0 + 1 : ctx->to.shell;
@@ -487,16 +493,18 @@ int main(int argc, char *argv[])
             deny(&ctx);
         }
 
-        // enforce persist.sys.root_access on non-eng builds
+        // enforce persist.sys.root_access on non-eng builds for apps
         if (strcmp("eng", build_type) != 0 &&
-               (atoi(enabled) & 1) != 1 ) {
-            ALOGE("Root access is disabled by system setting - enable it under settings -> developer options");
+                ctx.from.uid != AID_SHELL && ctx.from.uid != AID_ROOT &&
+                (atoi(enabled) & CM_ROOT_ACCESS_APPS_ONLY) != CM_ROOT_ACCESS_APPS_ONLY ) {
+            ALOGE("Apps root access is disabled by system setting - enable it under settings -> developer options");
             deny(&ctx);
         }
 
         // disallow su in a shell if appropriate
-        if (ctx.from.uid == AID_SHELL && (atoi(enabled) == 1)) {
-            ALOGE("Root access is disabled by a system setting - enable it under settings -> developer options");
+        if (ctx.from.uid == AID_SHELL &&
+                (atoi(enabled) & CM_ROOT_ACCESS_ADB_ONLY) != CM_ROOT_ACCESS_ADB_ONLY ) {
+            ALOGE("Shell root access is disabled by a system setting - enable it under settings -> developer options");
             deny(&ctx);
         }
     }
