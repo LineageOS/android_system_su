@@ -17,42 +17,53 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
-#include <cutils/log.h>
 
 #include "su.h"
 
 int database_check(const struct su_context *ctx)
 {
     FILE *fp;
-    char allow = '-';
-    char *filename = malloc(snprintf(NULL, 0, "%s/%u-%u", REQUESTOR_STORED_PATH, ctx->from.uid, ctx->to.uid) + 1);
-    sprintf(filename, "%s/%u-%u", REQUESTOR_STORED_PATH, ctx->from.uid, ctx->to.uid);
+    char filename[PATH_MAX];
+    char allow[7];
+    int last = 0;
+
+    snprintf(filename, sizeof(filename),
+                REQUESTOR_STORED_PATH "/%u-%u", ctx->from.uid, ctx->to.uid);
     if ((fp = fopen(filename, "r"))) {
-    ALOGD("Found file");
-        char cmd[PATH_MAX];
+        LOGD("Found file %s", filename);
+
+        fgets(allow, sizeof(allow), fp);
+        last = strlen(allow) - 1;
+        if (last >= 0)
+		allow[last] = 0;
+
+        char cmd[ARG_MAX];
         fgets(cmd, sizeof(cmd), fp);
-        int last = strlen(cmd) - 1;
-        ALOGD("this is the last character %u of the string", cmd[5]);
-        if (cmd[last] == '\n') {
-            cmd[last] = '\0';
-        }
-        ALOGD("Comparing %c %s, %u to %s", cmd[last - 2], cmd, last, get_command(&ctx->to));
-        if (strcmp(cmd, get_command(&ctx->to)) == 0) {
-            allow = fgetc(fp);
+        /* skip trailing '\n' */
+        last = strlen(cmd) - 1;
+        if (last >= 0)
+            cmd[last] = 0;
+
+        LOGD("Comparing '%s' to '%s'", cmd, get_command(&ctx->to));
+        if (strcmp(cmd, get_command(&ctx->to)) != 0) {
+            strcpy(allow, "prompt");
         }
         fclose(fp);
     } else if ((fp = fopen(REQUESTOR_STORED_DEFAULT, "r"))) {
-    ALOGD("Using default");
-        allow = fgetc(fp);
+        LOGD("Using default file %s", REQUESTOR_STORED_DEFAULT);
+        fgets(allow, sizeof(allow), fp);
+        last = strlen(allow) - 1;
+        if (last >=0)
+            allow[last] = 0;
+
         fclose(fp);
     }
-    free(filename);
 
-    if (allow == '1') {
-        return DB_ALLOW;
-    } else if (allow == '0') {
-        return DB_DENY;
+    if (strcmp(allow, "allow") == 0) {
+        return ALLOW;
+    } else if (strcmp(allow, "deny") == 0) {
+        return DENY;
     } else {
-        return DB_INTERACTIVE;
+        return INTERACTIVE;
     }
 }

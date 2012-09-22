@@ -23,15 +23,9 @@
 #endif
 #define LOG_TAG "su"
 
-// CyanogenMod-specific behavior
-#define CM_ROOT_ACCESS_DISABLED      0
-#define CM_ROOT_ACCESS_APPS_ONLY     1
-#define CM_ROOT_ACCESS_ADB_ONLY      2
-#define CM_ROOT_ACCESS_APPS_AND_ADB  3
-
 #define REQUESTOR "com.noshufou.android.su"
 #define REQUESTOR_DATA_PATH "/data/data/" REQUESTOR
-#define REQUESTOR_CACHE_PATH REQUESTOR_DATA_PATH "/cache"
+#define REQUESTOR_CACHE_PATH "/dev/" REQUESTOR
 
 #define REQUESTOR_STORED_PATH REQUESTOR_DATA_PATH "/files/stored"
 #define REQUESTOR_STORED_DEFAULT REQUESTOR_STORED_PATH "/default"
@@ -76,34 +70,50 @@ struct su_context {
     struct su_initiator from;
     struct su_request to;
     mode_t umask;
+    volatile pid_t child;
+    char sock_path[PATH_MAX];
 };
 
-enum {
-    DB_INTERACTIVE,
-    DB_DENY,
-    DB_ALLOW
-};
+typedef enum {
+    INTERACTIVE = -1,
+    DENY = 0,
+    ALLOW = 1,
+} allow_t;
 
-extern int database_check(const struct su_context *ctx);
-
-extern int send_intent(const struct su_context *ctx,
-                       const char *socket_path, int allow, const char *action);
+extern allow_t database_check(const struct su_context *ctx);
+extern void set_identity(unsigned int uid);
+extern int send_intent(struct su_context *ctx,
+                       allow_t allow, const char *action);
+extern void sigchld_handler(int sig);
 
 static inline char *get_command(const struct su_request *to)
 {
 	return (to->command) ? to->command : to->shell;
 }
 
-#if 0
-#undef ALOGE
-#define ALOGE(fmt,args...) fprintf(stderr, fmt, ##args)
-#undef ALOGD
-#define ALOGD(fmt,args...) fprintf(stderr, fmt, ##args)
-#undef ALOGW
-#define ALOGW(fmt,args...) fprintf(stderr, fmt, ##args)
+#include <cutils/log.h>
+#ifndef LOGE
+#define LOGE(...) ALOGE(__VA_ARGS__)
+#endif
+#ifndef LOGD
+#define LOGD(...) ALOGD(__VA_ARGS__)
+#endif
+#ifndef LOGW
+#define LOGW(...) ALOGW(__VA_ARGS__)
 #endif
 
-#define PLOGE(fmt,args...) ALOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno))
-#define PLOGEV(fmt,err,args...) ALOGE(fmt " failed with %d: %s", ##args, err, strerror(err))
+#if 0
+#undef LOGE
+#define LOGE(fmt,args...) fprintf(stderr, fmt, ##args)
+#undef LOGD
+#define LOGD(fmt,args...) fprintf(stderr, fmt, ##args)
+#undef LOGW
+#define LOGW(fmt,args...) fprintf(stderr, fmt, ##args)
+#endif
+
+#include <errno.h>
+#include <string.h>
+#define PLOGE(fmt,args...) LOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno))
+#define PLOGEV(fmt,err,args...) LOGE(fmt " failed with %d: %s", ##args, err, strerror(err))
 
 #endif

@@ -15,63 +15,106 @@
 ** limitations under the License.
 */
 
+#include <sys/types.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <paths.h>
 
 #include "su.h"
 
-int send_intent(const struct su_context *ctx,
-                const char *socket_path, int allow, const char *action)
+static void kill_child(pid_t pid)
 {
-	char command[PATH_MAX];
+    LOGD("killing child %d", pid);
+    if (pid) {
+        sigset_t set, old;
 
-	sprintf(command, "(/system/bin/am broadcast -a '%s' --es socket '%s' --ei caller_uid '%d' --ei allow '%d' --ei version_code '%d' %s) > /dev/null",
-			action, socket_path, ctx->from.uid, allow, VERSION_CODE,
-			strcmp(action, ACTION_RESULT) ? "" : "&");
-
-    // before sending the intent, make sure the (uid and euid) and (gid and egid) match,
-    // otherwise LD_LIBRARY_PATH is wiped in Android 4.0+.
-    // Also, sanitize all secure environment variables (from linker_environ.c in linker).
-
-    /* The same list than GLibc at this point */
-    static const char* const unsec_vars[] = {
-        "GCONV_PATH",
-        "GETCONF_DIR",
-        "HOSTALIASES",
-        "LD_AUDIT",
-        "LD_DEBUG",
-        "LD_DEBUG_OUTPUT",
-        "LD_DYNAMIC_WEAK",
-        "LD_LIBRARY_PATH",
-        "LD_ORIGIN_PATH",
-        "LD_PRELOAD",
-        "LD_PROFILE",
-        "LD_SHOW_AUXV",
-        "LD_USE_LOAD_BIAS",
-        "LOCALDOMAIN",
-        "LOCPATH",
-        "MALLOC_TRACE",
-        "MALLOC_CHECK_",
-        "NIS_PATH",
-        "NLSPATH",
-        "RESOLV_HOST_CONF",
-        "RES_OPTIONS",
-        "TMPDIR",
-        "TZDIR",
-        "LD_AOUT_LIBRARY_PATH",
-        "LD_AOUT_PRELOAD",
-        // not listed in linker, used due to system() call
-        "IFS",
-    };
-    const char* const* cp   = unsec_vars;
-    const char* const* endp = cp + sizeof(unsec_vars)/sizeof(unsec_vars[0]);
-    while (cp < endp) {
-        unsetenv(*cp);
-        cp++;
+        sigemptyset(&set);
+        sigaddset(&set, SIGCHLD);
+        if (sigprocmask(SIG_BLOCK, &set, &old)) {
+            PLOGE("sigprocmask(SIG_BLOCK)");
+            return;
+        }
+        if (kill(pid, SIGKILL))
+            PLOGE("kill (%d)", pid);
+        else if (sigsuspend(&old) && errno != EINTR)
+            PLOGE("sigsuspend");
+        if (sigprocmask(SIG_SETMASK, &old, NULL))
+            PLOGE("sigprocmask(SIG_BLOCK)");
     }
+}
 
-    // sane value so "am" works
-    setenv("LD_LIBRARY_PATH", "/vendor/lib:/system/lib", 1);
-    setegid(getgid());
-    seteuid(getuid());
-    return system(command);
+static void setup_sigchld_handler(__sighandler_t handler)
+{
+    struct sigaction act;
+
+    act.sa_handler = handler;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_NOCLDSTOP | SA_RESTART;
+    if (sigaction(SIGCHLD, &act, NULL)) {
+        PLOGE("sigaction(SIGCHLD)");
+        exit(EXIT_FAILURE);
+    }
+}
+
+int send_intent(struct su_context *ctx, allow_t allow, const char *action)
+{
+    const char *socket_path;
+    unsigned int uid = ctx->from.uid;
+    __sighandler_t handler;
+    pid_t pid;
+
+    pid = ctx->child;
+    if (pid) {
+        kill_child(pid);
+        pid = ctx->child;
+        if (pid) {
+            LOGE("child %d is still running", pid);
+            return -1;
+        }
+    }
+    if (allow == INTERACTIVE) {
+        socket_path = ctx->sock_path;
+        handler = sigchld_handler;
+    } else {
+        socket_path = "";
+        handler = SIG_IGN;
+    }
+    setup_sigchld_handler(handler);
+
+    pid = fork();
+    /* Child */
+    if (!pid) {
+        char command[ARG_MAX];
+
+        snprintf(command, sizeof(command),
+            "exec /system/bin/am broadcast -a %s --es socket '%s' "
+            "--ei caller_uid %d --ei allow %d "
+            "--ei version_code %d",
+            action, socket_path, uid, allow, VERSION_CODE);
+        char *args[] = { "sh", "-c", command, NULL, };
+
+        /*
+         * before sending the intent, make sure the effective uid/gid match
+         * the real uid/gid, otherwise LD_LIBRARY_PATH is wiped
+         * in Android 4.0+.
+         */
+        set_identity(uid);
+        int zero = open("/dev/zero", O_RDONLY | O_CLOEXEC);
+        dup2(zero, 0);
+        int null = open("/dev/null", O_WRONLY | O_CLOEXEC);
+        dup2(null, 1);
+        dup2(null, 2);
+        LOGD("Executing %s\n", command);
+        execv(_PATH_BSHELL, args);
+        PLOGE("exec am");
+        _exit(EXIT_FAILURE);
+    }
+    /* Parent */
+    if (pid < 0) {
+        PLOGE("fork");
+        return -1;
+    }
+    ctx->child = pid;
+    return 0;
 }
