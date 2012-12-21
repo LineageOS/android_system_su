@@ -375,7 +375,10 @@ static __attribute__ ((noreturn)) void deny(struct su_context *ctx)
 {
     char *cmd = get_command(&ctx->to);
 
-    send_intent(ctx, DENY, ACTION_RESULT);
+    // No send to UI denied requests for shell and root users (they are in the log)
+    if( ctx->from.uid != AID_SHELL && ctx->from.uid != AID_ROOT ) {
+        send_intent(ctx, DENY, ACTION_RESULT);
+    }
     LOGW("request rejected (%u->%u %s)", ctx->from.uid, ctx->to.uid, cmd);
     fprintf(stderr, "%s\n", strerror(EACCES));
     exit(EXIT_FAILURE);
@@ -387,7 +390,10 @@ static __attribute__ ((noreturn)) void allow(struct su_context *ctx)
     int argc, err;
 
     umask(ctx->umask);
-    send_intent(ctx, ALLOW, ACTION_RESULT);
+    // No send to UI accepted requests for shell and root users (they are in the log)
+    if( ctx->from.uid != AID_SHELL && ctx->from.uid != AID_ROOT ) {
+        send_intent(ctx, ALLOW, ACTION_RESULT);
+    }
 
     arg0 = strrchr (ctx->to.shell, '/');
     arg0 = (arg0) ? arg0 + 1 : ctx->to.shell;
@@ -468,16 +474,19 @@ int access_disabled(const struct su_initiator *from)
         } else
             memcpy(enabled, "1", 2);
 
-        /* enforce persist.sys.root_access on non-eng builds */
-        if (strcmp("eng", build_type) != 0 && (atoi(enabled) & 1) != 1 ) {
-            LOGE("Root access is disabled by system setting - "
+        /* enforce persist.sys.root_access on non-eng builds for apps */
+        if (strcmp("eng", build_type) != 0 &&
+                from->uid != AID_SHELL && from->uid != AID_ROOT &&
+                (atoi(enabled) & CM_ROOT_ACCESS_APPS_ONLY) != CM_ROOT_ACCESS_APPS_ONLY ) {
+            LOGE("Apps root access is disabled by system setting - "
                  "enable it under settings -> developer options");
             return 1;
         }
 
         /* disallow su in a shell if appropriate */
-        if (from->uid == AID_SHELL && (atoi(enabled) == 1)) {
-            LOGE("Root access is disabled by a system setting - "
+        if (from->uid == AID_SHELL &&
+                (atoi(enabled) & CM_ROOT_ACCESS_ADB_ONLY) != CM_ROOT_ACCESS_ADB_ONLY ) {
+            LOGE("Shell root access is disabled by a system setting - "
                  "enable it under settings -> developer options");
             return 1;
         }
